@@ -1,0 +1,52 @@
+---
+- name: Install the 'Container Management' package group
+  ansible.builtin.dnf:
+    name: "@Container Management"
+    state: present
+
+- name: Install package podman-docker
+  ansible.builtin.dnf:
+    name: podman-docker
+    state: present
+
+- name: Install package podman-compose
+  ansible.builtin.dnf:
+    name: podman-compose
+    state: present
+
+- name: Install package podman-tui
+  ansible.builtin.dnf:
+    name: podman-tui
+    state: present
+
+- name: Get current userid
+  ansible.builtin.shell: id -u {{ ansible_ssh_user }}
+  become: false
+  register: user_userid
+  ignore_errors: false
+  changed_when: "user_userid.rc != 0"
+
+- name: Test for podman socket
+  ansible.builtin.shell: "test -e /run/user/{{ user_userid.stdout }}/podman/podman.sock"
+  register: podman_socket_exists
+  ignore_errors: true
+  changed_when: "podman_socket_exists.rc != 0"
+
+- name: Start podman.socket service
+  become: false
+  ansible.builtin.command:
+    cmd: systemctl --user start podman.socket; systemctl --user enable podman.socket
+  when:
+    - "podman_socket_exists.rc != 0"
+
+- name: Test for docker socket
+  ansible.builtin.shell: test -e /var/run/docker.sock
+  register: docker_socket_exists
+  ignore_errors: true
+  changed_when: "docker_socket_exists.rc != 0"
+
+- name: Create docker socket
+  ansible.builtin.command:
+    cmd: "ln -s /var/run/docker.sock /run/user/{{ user_userid.stdout }}/podman/podman.sock"
+  when:
+    - "docker_socket_exists.rc != 0"

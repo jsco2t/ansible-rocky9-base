@@ -1,0 +1,37 @@
+---
+- name: Check if nvim is already installed.
+  command: /opt/nvim-linux64/bin/nvim --version
+  ignore_errors: true
+  register: nvim_version_result
+  changed_when: false
+
+- name: Remove current installation.
+  file:
+    state: absent
+    path: /opt/nvim-linux64/bin/nvim
+  when:
+    - nvim_version_result is succeeded
+    - nvim_version not in nvim_version_result.stdout
+
+- name: Download nvim.
+  get_url:
+    url: "{{ nvim_download_url }}"
+    dest: /usr/local/src/{{ nvim_tarball }}
+  when: nvim_version_result is failed
+    or nvim_version not in nvim_version_result.stdout
+
+- name: Extract nvim.
+  unarchive:
+    src: /usr/local/src/{{ nvim_tarball }}
+    dest: /opt
+    copy: no
+  when: nvim_version_result is failed
+    or nvim_version not in nvim_version_result.stdout
+
+- name: Add nvim to to system-wide $PATH.
+  copy:
+    dest: /etc/profile.d/nvim-path.sh
+    content: |-
+      export PATH=$PATH:/opt/nvim-linux64/bin
+  when: nvim_version_result is failed
+    or nvim_version not in nvim_version_result.stdout

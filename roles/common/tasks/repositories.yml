@@ -1,0 +1,25 @@
+---
+- name: Ensure the crb repository is enabled
+  community.general.dnf_config_manager:
+    name: crb
+    state: enabled
+
+#- name: Install package epel-release
+#  yum:
+#    name: epel-release
+#    state: present
+
+- name: Install package epel-release
+  ansible.builtin.dnf:
+    name: epel-release
+    state: present
+
+- name: Install package elrepo-release
+  ansible.builtin.dnf:
+    name: elrepo-release
+    state: present
+
+- name: Install package rpmfusion-free-release
+  ansible.builtin.dnf:
+    name: rpmfusion-free-release
+    state: present
