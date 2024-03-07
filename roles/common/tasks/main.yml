@@ -1,0 +1,9 @@
+---
+# golang
+- include_tasks: go.yml
+
+# neovim
+- include_tasks: nvim.yml
+
+# dnf repo setup
+- include_tasks: repositories.yml
