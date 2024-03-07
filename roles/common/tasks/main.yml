@@ -7,3 +7,6 @@
 
 # dnf repo setup
 - include_tasks: repositories.yml
+
+# python
+- include_tasks: python.yml
