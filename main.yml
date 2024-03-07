@@ -6,3 +6,9 @@
     - common
     - podman
     - cleanup
+
+- hosts: servers
+  become: true
+
+  roles:
+    - helm

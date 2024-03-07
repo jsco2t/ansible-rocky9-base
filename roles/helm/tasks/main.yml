@@ -1,0 +1,29 @@
+---
+- name: Check if helm is already installed.
+  command: /usr/local/bin/helm version
+  ignore_errors: true
+  register: helm_version_result
+  changed_when: false
+
+- name: Remove current helm installation.
+  file:
+    state: absent
+    path: /usr/local/bin/helm
+  when:
+    - helm_version_result is succeeded
+    - helm_version not in helm_version_result.stdout
+
+- name: Download helm binary archive.
+  unarchive:
+    src: "{{ helm_download_url }}"
+    dest: /tmp
+    remote_src: yes
+  when: helm_version_result is failed
+    or helm_version not in helm_version_result.stdout
+
+- name: Move helm binary into place.
+  command: cp /tmp/linux-amd64/helm /usr/local/bin/helm
+  args:
+    creates: /usr/local/bin/helm
+  when: helm_version_result is failed
+    or helm_version not in helm_version_result.stdout
