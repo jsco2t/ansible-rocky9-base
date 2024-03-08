@@ -35,7 +35,20 @@
 - name: Start podman.socket service
   become: false
   ansible.builtin.command:
-    cmd: systemctl --user start podman.socket; systemctl --user enable podman.socket
+    cmd: systemctl --user start podman.socket
+  when:
+    - "podman_socket_exists.rc != 0"
+
+- name: Enable podman.socket service
+  become: false
+  ansible.builtin.command:
+    cmd: systemctl --user enable podman.socket
+  when:
+    - "podman_socket_exists.rc != 0"
+
+- name: Remove invalid docker socket
+  ansible.builtin.command:
+    cmd: rm -f /var/run/docker.sock
   when:
     - "podman_socket_exists.rc != 0"
 
@@ -47,6 +60,6 @@
 
 - name: Create docker socket
   ansible.builtin.command:
-    cmd: "ln -s /var/run/docker.sock /run/user/{{ user_userid.stdout }}/podman/podman.sock"
+    cmd: "ln -s /run/user/{{ user_userid.stdout }}/podman/podman.sock /var/run/docker.sock"
   when:
     - "docker_socket_exists.rc != 0"

@@ -1,4 +1,10 @@
 ---
+# default system-wide env config
+- include_tasks: env.yml
+
+# firewall management
+- include_tasks: firewall.yml
+
 # golang
 - include_tasks: go.yml
 
@@ -10,3 +16,6 @@
 
 # python
 - include_tasks: python.yml
+
+# tmux support
+- include_tasks: tmux.yml

@@ -1,2 +1,2 @@
 ---
-ansible_ssh_user: ruser
+#ansible_ssh_user: foo # defined in inventory file instead

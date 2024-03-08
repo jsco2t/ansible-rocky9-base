@@ -1,0 +1,9 @@
+---
+- name: open firewall ports
+  ansible.posix.firewalld:
+    port: "{{ item }}"
+    permanent: true
+    state: enabled
+  loop: "{{ open_ports }}"
+  # when check here only works if `open_ports` has been previously defined as, at least: `[]`
+  when: ( item | default("") ) or ( item is not none )

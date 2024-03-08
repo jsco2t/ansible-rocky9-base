@@ -1,0 +1,2 @@
+---
+open_ports: [] # default to no ports being opened on firewall

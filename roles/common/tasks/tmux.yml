@@ -1,0 +1,21 @@
+---
+- name: Install package tmux
+  ansible.builtin.dnf:
+    name: tmux
+    state: present
+
+- name: Setup tmux config file
+  ansible.builtin.template:
+    src: tmux.conf
+    dest: "/home/{{ ansible_ssh_user }}/.tmux.conf"
+    mode: 0644
+
+- name: Get tmux file contents
+  ansible.builtin.shell: "cat /home/{{ ansible_ssh_user }}/.tmux.conf"
+  register: tmux_content
+  changed_when: 1 != 1 # don't report as changed
+
+- name: Print tmux_contents
+  ansible.builtin.debug:
+    var: tmux_content
+    verbosity: 1 # only report when `-v` is passed on input
